@@ -1,0 +1,6 @@
+name: WinzoriaMenu
+version: '${project.version}'
+main: fr.kenda.winzoriamenu.WinzoriaMenu
+load: STARTUP
+authors: [Kenda]
+description: Plugin de menu basé sur DeluxeMenu
