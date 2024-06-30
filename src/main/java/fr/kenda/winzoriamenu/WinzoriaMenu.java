@@ -34,7 +34,7 @@ public final class WinzoriaMenu extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
+        manager.getManager(GUIManager.class).unregisterCommands();
     }
 
     public <T> T getManager(Class<T> clazz) {

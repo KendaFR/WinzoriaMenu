@@ -4,9 +4,11 @@ import fr.kenda.winzoriamenu.WinzoriaMenu;
 import fr.kenda.winzoriamenu.gui.CustomGUI;
 import fr.kenda.winzoriamenu.managers.GUIManager;
 import fr.kenda.winzoriamenu.utils.Messages;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class WinzoriaMenuCommand implements CommandExecutor {
@@ -27,9 +29,28 @@ public class WinzoriaMenuCommand implements CommandExecutor {
             return true;
         }
 
-        if (args.length > 2) {
+        if (args.length > 3) {
             sendHelp(commandSender);
             return true;
+        }
+
+        if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("open")) {
+                String menu = args[1];
+                String target = args[2];
+
+                if (!guiManager.isMenuExist(menu)) {
+                    commandSender.sendMessage(Messages.transformColor("&cLe menu " + menu + " n'existe pas."));
+                    return false;
+                }
+                Player t = Bukkit.getPlayer(target);
+                if (t == null) {
+                    commandSender.sendMessage(Messages.transformColor("&cLe joueur " + target + " n'est pas connecté."));
+                    return false;
+                }
+
+                return true;
+            }
         }
 
         String action = args[0].toLowerCase();
@@ -76,7 +97,9 @@ public class WinzoriaMenuCommand implements CommandExecutor {
             sender.sendMessage("Cette commande ne peut être utilisée que par un joueur.");
             return;
         }
-        CustomGUI gui = guiManager.getGuis().get(menuName);
-        gui.create((Player) sender);
+        Player p = (Player) sender;
+        YamlConfiguration config = guiManager.getGuis().get(menuName);
+        CustomGUI gui = new CustomGUI(config);
+        gui.create(p);
     }
 }

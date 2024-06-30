@@ -12,16 +12,18 @@ public class ItemData {
     private final List<Integer> slots;
     private final int uniqueSlot;
     private final int amount;
+    private final byte data;
     private final List<String> rightClickCommands;
     private final List<String> leftClickCommands;
     private final List<String> lores;
 
-    public ItemData(String name, Material material, List<Integer> slots, int amount, List<String> rightClickCommands, List<String> leftClickCommands, List<String> lores) {
+    public ItemData(String name, Material material, List<Integer> slots, int amount, int data, List<String> rightClickCommands, List<String> leftClickCommands, List<String> lores) {
         this.name = Messages.transformColor(name.replace("%prefix%", Messages.getPrefix()));
         this.material = material;
         this.slots = slots;
         this.uniqueSlot = -1;
         this.amount = amount;
+        this.data = (byte) data;
         this.rightClickCommands = rightClickCommands;
         this.leftClickCommands = leftClickCommands;
         this.lores = lores;
@@ -29,11 +31,12 @@ public class ItemData {
         lores.replaceAll(s -> Messages.transformColor(s.replace("%prefix%", Messages.getPrefix())));
     }
 
-    public ItemData(String name, Material material, int uniqueSlot, int amount, List<String> rightClickCommands, List<String> leftClickCommands, List<String> lores) {
+    public ItemData(String name, Material material, int uniqueSlot, int amount, int data, List<String> rightClickCommands, List<String> leftClickCommands, List<String> lores) {
         this.name = Messages.transformColor(name.replace("%prefix%", Messages.getPrefix()));
         this.material = material;
         this.slots = null;
         this.uniqueSlot = uniqueSlot;
+        this.data = (byte) data;
         this.amount = amount;
         this.rightClickCommands = rightClickCommands;
         this.leftClickCommands = leftClickCommands;
@@ -72,5 +75,9 @@ public class ItemData {
 
     public int getUniqueSlot() {
         return uniqueSlot;
+    }
+
+    public byte getData() {
+        return data;
     }
 }

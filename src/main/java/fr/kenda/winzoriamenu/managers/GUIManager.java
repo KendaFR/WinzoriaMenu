@@ -1,19 +1,22 @@
 package fr.kenda.winzoriamenu.managers;
 
 import fr.kenda.winzoriamenu.WinzoriaMenu;
+import fr.kenda.winzoriamenu.commands.WMCommand;
 import fr.kenda.winzoriamenu.gui.CustomGUI;
 import fr.kenda.winzoriamenu.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 
 public class GUIManager implements IManager {
 
-    private final HashMap<String, CustomGUI> guis = new HashMap<>();
+    private final Map<String, YamlConfiguration> guis = new HashMap<>();
     private final WinzoriaMenu instance = WinzoriaMenu.getInstance();
 
     @Override
@@ -23,36 +26,60 @@ public class GUIManager implements IManager {
         final String prefix = Messages.getPrefix();
         final FileConfiguration config = instance.getConfig();
 
-        console.sendMessage(Messages.transformColor("&8&m========== [ " + Messages.getPrefix() + "&8&m] =========="));
+        printMessage(console, prefix);
 
-        for (String key : config.getConfigurationSection("menus").getKeys(false)) {
-
+        config.getConfigurationSection("menus").getKeys(false).forEach(key -> {
             String fileName = config.getString("menus." + key);
             File file = new File(dataFolder + "/menus/" + fileName);
 
             if (!file.exists()) {
                 console.sendMessage(prefix + Messages.transformColor("&cLe fichier menus/" + fileName + " n'existe pas."));
-                continue;
+                return;
             }
 
             YamlConfiguration menu = YamlConfiguration.loadConfiguration(file);
-            guis.put(key, new CustomGUI(menu));
+            guis.put(key, menu);
+            registerCommand(key);
             console.sendMessage(prefix + Messages.transformColor("&8&oChargement du fichier: " + fileName));
-        }
-        console.sendMessage(Messages.transformColor("&8&m========== [ " + Messages.getPrefix() + "&8&m] =========="));
+        });
+
+        printMessage(console, prefix);
+    }
+
+    private void printMessage(ConsoleCommandSender console, String prefix) {
+        console.sendMessage(Messages.transformColor("&8&m========== [ " + prefix + "&8&m] =========="));
+    }
+
+    private void registerCommand(String cmd) {
+        WMCommand.registerCommand(cmd, (sender, command, label, args) -> {
+            if (!(sender instanceof Player)) {
+                return false;
+            }
+
+            Player player = (Player) sender;
+            YamlConfiguration config = guis.get(cmd);
+            CustomGUI gui = new CustomGUI(config);
+            gui.create(player);
+            return true;
+        });
+    }
+
+    public void unregisterCommands() {
+        guis.keySet().forEach(WMCommand::unregisterCommand);
     }
 
     public void reloadGUI() {
+        unregisterCommands();
         guis.clear();
         instance.reloadConfig();
         register();
     }
 
-    public HashMap<String, CustomGUI> getGuis() {
+    public Map<String, YamlConfiguration> getGuis() {
         return guis;
     }
 
     public boolean isMenuExist(String key) {
-        return guis.get(key) != null;
+        return guis.containsKey(key);
     }
 }

@@ -1,9 +1,7 @@
 package fr.kenda.winzoriamenu.gui;
 
 import fr.kenda.winzoriamenu.WinzoriaMenu;
-import fr.kenda.winzoriamenu.commands.WMCommand;
 import fr.kenda.winzoriamenu.gui.data.ItemData;
-import fr.kenda.winzoriamenu.managers.GUIManager;
 import fr.kenda.winzoriamenu.utils.ItemBuilder;
 import fr.kenda.winzoriamenu.utils.Messages;
 import org.bukkit.Bukkit;
@@ -35,24 +33,22 @@ public class CustomGUI implements Listener {
     public CustomGUI(YamlConfiguration fileConfig) {
         itemData = new ArrayList<>();
         configuration = fileConfig;
-        title = Messages.transformColor(configuration.getString("menu_title"));
+        title = Messages.transformColor(fileConfig.getString("menu_title"));
 
-        size = configuration.getInt("size") * 9;
+        size = fileConfig.getInt("size") * 9;
 
-        final String openCommand = configuration.getString("open_command");
-        registerCommand(openCommand);
-
-        final ConfigurationSection items = configuration.getConfigurationSection("items");
-        for (String key : items.getKeys(false))
+        final ConfigurationSection items = fileConfig.getConfigurationSection("items");
+        for (String key : items.getKeys(false)) {
             createItemData(key);
+        }
 
         Bukkit.getPluginManager().registerEvents(this, WinzoriaMenu.getInstance());
-
     }
 
     private void createItemData(String key) {
         final Material material = Material.valueOf(configuration.getString("items." + key + ".material"));
         final int amount = configuration.getInt("items." + key + ".amount");
+        final int data = configuration.getInt("items." + key + ".data");
         final List<Integer> slots = configuration.getIntegerList("items." + key + ".slots");
         final String displayName = configuration.getString("items." + key + ".display_name");
         final List<String> lores = configuration.getStringList("items." + key + ".lores");
@@ -61,18 +57,17 @@ public class CustomGUI implements Listener {
 
         if (slots.isEmpty()) {
             final int slot = configuration.getInt("items." + key + ".slots");
-            itemData.add(new ItemData(displayName, material, slot, amount, right_click, left_click, lores));
+            itemData.add(new ItemData(displayName, material, slot, amount, data, right_click, left_click, lores));
         } else
-            itemData.add(new ItemData(displayName, material, slots, amount, right_click, left_click, lores));
+            itemData.add(new ItemData(displayName, material, slots, amount, data, right_click, left_click, lores));
     }
 
     public void create(Player player) {
-        CustomGUI playerGUI = new CustomGUI(configuration);
-        playerGUI.owner = player;
-        playerGUI.inventory = Bukkit.createInventory(player, size, title);
-        player.openInventory(playerGUI.inventory);
+        owner = player;
+        inventory = Bukkit.createInventory(player, size, title);
+        player.openInventory(inventory);
 
-        playerGUI.openMenu();
+        openMenu();
     }
 
     public void openMenu() {
@@ -87,7 +82,7 @@ public class CustomGUI implements Listener {
                     .map(s -> Messages.transformColor(s.replace("%player%", owner.getName())))
                     .collect(Collectors.toList());
 
-            ItemBuilder itemBuilder = new ItemBuilder(item.getMaterial(), item.getAmount())
+            ItemBuilder itemBuilder = new ItemBuilder(item.getMaterial(), item.getAmount(), item.getData())
                     .setName(item.getName())
                     .setLore(lores);
 
@@ -107,17 +102,6 @@ public class CustomGUI implements Listener {
         owner.closeInventory();
     }
 
-    private void registerCommand(String cmd) {
-        WMCommand.registerCommand(cmd, (sender, command, label, args) -> {
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
-                create(player);
-                return true;
-            }
-            return false;
-        });
-    }
-
     private ItemData getItemFromMaterial(Material mat) {
         for (ItemData data : itemData) {
             if (data.getMaterial() == mat) return data;
@@ -127,16 +111,17 @@ public class CustomGUI implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent e) {
+        ItemStack current = e.getCurrentItem();
+
+        if (current == null) return;
+
         if (!(e.getInventory().equals(this.inventory) && e.getRawSlot() < this.inventory.getSize())) {
             return;
         }
 
-        if (e.getCurrentItem() == null) return;
-
         e.setCancelled(true);
 
-
-        Material mat = e.getCurrentItem().getType();
+        Material mat = current.getType();
         ItemData item = getItemFromMaterial(mat);
         ClickType clickType = e.getClick();
         if (clickType == ClickType.RIGHT || clickType == ClickType.LEFT)
@@ -169,7 +154,6 @@ public class CustomGUI implements Listener {
         String cmd = "";
         if (command.contains(" "))
             cmd = command.substring(command.indexOf(" ") + 1).replace("%player%", owner.getName());
-        System.out.println("Command: " + cmd);
 
         switch (prefix) {
             case "[close]":
@@ -183,12 +167,7 @@ public class CustomGUI implements Listener {
                 break;
             case "[openguimenu]":
                 close();
-                GUIManager guiManager = WinzoriaMenu.getInstance().getManager(GUIManager.class);
-                if (guiManager != null) {
-                    CustomGUI gui = guiManager.getGuis().get(cmd.trim());
-                    if (gui != null)
-                        gui.create(owner);
-                }
+                create(owner);
                 break;
         }
     }

@@ -1,6 +1,5 @@
 package fr.kenda.winzoriamenu.commands;
 
-import com.avaje.ebeaninternal.server.core.Message;
 import fr.kenda.winzoriamenu.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -9,6 +8,7 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 public class WMCommand extends Command {
     private final CommandExecutor executor;
@@ -28,6 +28,23 @@ public class WMCommand extends Command {
             Bukkit.getConsoleSender().sendMessage(Messages.transformColor("&cUne erreur s'est produite lors de la création de la commande."));
         }
     }
+
+    public static void unregisterCommand(String name) {
+        try {
+            Field commandMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            commandMapField.setAccessible(true);
+            CommandMap commandMap = (CommandMap) commandMapField.get(Bukkit.getServer());
+
+            Field knownCommandsField = commandMap.getClass().getDeclaredField("knownCommands");
+            knownCommandsField.setAccessible(true);
+
+            Map<String, Command> knownCommands = (Map<String, Command>) knownCommandsField.get(commandMap);
+            knownCommands.remove(name);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            Bukkit.getConsoleSender().sendMessage(Messages.transformColor("&cUne erreur s'est produite lors de la suppression de la commande."));
+        }
+    }
+
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {

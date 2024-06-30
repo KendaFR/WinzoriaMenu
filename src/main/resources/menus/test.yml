@@ -35,23 +35,9 @@ open_command: test
 #L'ordre des appels va déterminer l'affichage des items.
 #Par exemple si le 'test' est avant la 'décoration', la décoration va prendre la priorité sur l'item à affiché
 items:
-  'test':
-    material: DIRT
-    amount: 1
-    slots: 10
-    display_name: "&aUn bloc de test ?"
-    lore:
-      - ""
-      - "&cJe suis un beau bloc de dirt ! <3"
-      - ""
-    right_click_commands:
-      - "[close]"
-      - "[console] tell %player% Tu as vu, je suis un bloc de terre !"
-    left_click_commands:
-      - "[close]"
-      - "[player] say \"Incroyable, j'ai cliquer sur le bloc de terre !\""
   'decoration':
     material: GLASS
+    data: 5
     amount: 1
     slots:
       - 0
@@ -74,3 +60,33 @@ items:
       - 25
       - 26
     display_name: "%prefix%"
+  'test':
+    material: DIRT
+    amount: 1
+    slots: 10
+    display_name: "&aUn bloc de test ?"
+    lore:
+      - ""
+      - "&cJe suis un beau bloc de dirt ! <3"
+      - ""
+    right_click_commands:
+      - "[close]"
+      - "[console] tell %player% Tu as vu, je suis un bloc de terre !"
+    left_click_commands:
+      - "[close]"
+      - "[player] say \"Incroyable, j'ai cliquer sur le bloc de terre !\""
+  'permission':
+    material: POTION
+    amount: 1
+    slots: 10
+    display_name: "&aUn bloc de test ?"
+    lore:
+      - ""
+      - "&cJe suis un beau bloc de dirt ! <3"
+      - ""
+    right_click_commands:
+      - "[close]"
+      - "[console] tell %player% Tu as vu, je suis un bloc de terre !"
+    left_click_commands:
+      - "[close]"
+      - "[player] say \"Incroyable, j'ai cliquer sur le bloc de terre !\""
