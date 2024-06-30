@@ -1,1 +1,76 @@
 #example
+#Le menu de test va servir à montrer comment fonctionne le plugin
+#=========================================================
+#
+# menu_title: Le titre du menu
+# size: Le nombre de ligne dans le menu
+# open_command: la commande pour ouvrir le menu
+#
+#=========================================================
+#items:
+# '[cle]': On peut mettre ce qu'on veut
+#   material: Le matériau a utilisé pour l'item
+#   amount: Le nombre (si absent, par défaut c'est 1)
+#   slots: Les slot(s) ou l'item sera dans l'inventaire
+#   display_name: Le nom de l'item (optionnel)
+#   lore: La description qui sera affichée (optionnel)
+#   right_click_commands: La/Les commande(s) à effectuer lors d'un clic droit (optionnel)
+#   left_click_commands: La/Les commande(s) à effectuer lors d'un clic gauche (optionnel)
+#
+#===================[PLACEHOLDER]============================
+# Voici la liste des placeholder à pouvoir mettre dans les commandes:
+#
+# [close]: Ferme le menu
+# [openguimenu]: Ouvre un autre menu
+# [player]: Le joueur execute une commande
+# [console]: la console execute une commande
+# %player%: On cible le joueur
+# %prefix%: Le prefix du plugin
+
+menu_title: '&6&lMenu de Test'
+size: 3
+open_command: test
+
+#ATTENTION
+#L'ordre des appels va déterminer l'affichage des items.
+#Par exemple si le 'test' est avant la 'décoration', la décoration va prendre la priorité sur l'item à affiché
+items:
+  'test':
+    material: DIRT
+    amount: 1
+    slots: 10
+    display_name: "&aUn bloc de test ?"
+    lore:
+      - ""
+      - "&cJe suis un beau bloc de dirt ! <3"
+      - ""
+    right_click_commands:
+      - "[close]"
+      - "[console] tell %player% Tu as vu, je suis un bloc de terre !"
+    left_click_commands:
+      - "[close]"
+      - "[player] say \"Incroyable, j'ai cliquer sur le bloc de terre !\""
+  'decoration':
+    material: GLASS
+    amount: 1
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 13
+      - 17
+      - 19
+      - 20
+      - 21
+      - 23
+      - 24
+      - 25
+      - 26
+    display_name: "%prefix%"

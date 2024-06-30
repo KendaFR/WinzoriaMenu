@@ -1,6 +1,7 @@
 package fr.kenda.winzoriamenu.managers;
 
 import fr.kenda.winzoriamenu.WinzoriaMenu;
+import fr.kenda.winzoriamenu.utils.Config;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -18,7 +19,9 @@ public class FileManager implements IManager {
     @Override
     public void register() {
         createFile("messages");
-        createFile("menus/test");
+        if (Config.getBoolean("generate_test_file"))
+            createFile("menus/test");
+
     }
 
 
@@ -28,11 +31,14 @@ public class FileManager implements IManager {
      * @param fileName String
      */
     public void createFile(String fileName) {
-        instance.saveResource(fileName + ".yml", false);
         final File file = new File(instance.getDataFolder(), fileName + ".yml");
+        if (!file.exists()) {
+            instance.saveResource(fileName + ".yml", false);
+        }
         FileConfiguration configFile = YamlConfiguration.loadConfiguration(file);
         files.put(fileName, configFile);
     }
+
 
     /**
      * Get configuration from file

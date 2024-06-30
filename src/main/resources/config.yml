@@ -1,0 +1,15 @@
+#####################################################
+#                   Author: Kenda                    #
+#                Created: 29/06/2024                 #
+#               Plugin: WinzoriaMenu               #
+#  github: https://github.com/KendaFR/WinzoriaMenu   #
+#####################################################
+
+prefix: "&a[WinzoriaMenu]"
+
+#Générer le fichier de test
+generate_test_file: true
+
+#La liste des menus à enregistré dans le plugin
+menus:
+  test: "test.yml"

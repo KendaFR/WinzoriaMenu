@@ -1,14 +1,17 @@
 package fr.kenda.winzoriamenu.managers;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public class Manager implements IManager{
+public class Manager implements IManager {
 
-    private final HashMap<Class<?>, IManager> managers = new HashMap<>();
+    private final Map<Class<?>, IManager> managers = new LinkedHashMap<>();
 
     @Override
     public final void register() {
         managers.put(FileManager.class, new FileManager());
+        managers.put(GUIManager.class, new GUIManager());
+        managers.put(CommandManager.class, new CommandManager());
 
         managers.forEach((aClass, iManager) -> iManager.register());
     }
