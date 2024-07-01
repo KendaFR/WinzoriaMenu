@@ -12,6 +12,7 @@
 #   material: Le matériau a utilisé pour l'item
 #   amount: Le nombre (si absent, par défaut c'est 1)
 #   slots: Les slot(s) ou l'item sera dans l'inventaire
+#   data: La data du bloc (si il en a  un) (optionnel)
 #   display_name: Le nom de l'item (optionnel)
 #   lore: La description qui sera affichée (optionnel)
 #   right_click_commands: La/Les commande(s) à effectuer lors d'un clic droit (optionnel)
@@ -36,7 +37,7 @@ open_command: test
 #Par exemple si le 'test' est avant la 'décoration', la décoration va prendre la priorité sur l'item à affiché
 items:
   'decoration':
-    material: GLASS
+    material: STAINED_GLASS
     data: 5
     amount: 1
     slots:
@@ -65,7 +66,7 @@ items:
     amount: 1
     slots: 10
     display_name: "&aUn bloc de test ?"
-    lore:
+    lores:
       - ""
       - "&cJe suis un beau bloc de dirt ! <3"
       - ""
@@ -75,18 +76,14 @@ items:
     left_click_commands:
       - "[close]"
       - "[player] say \"Incroyable, j'ai cliquer sur le bloc de terre !\""
-  'permission':
+  'speed':
     material: POTION
     amount: 1
-    slots: 10
-    display_name: "&aUn bloc de test ?"
-    lore:
-      - ""
-      - "&cJe suis un beau bloc de dirt ! <3"
-      - ""
-    right_click_commands:
-      - "[close]"
-      - "[console] tell %player% Tu as vu, je suis un bloc de terre !"
+    data: 66
+    slots: 11
+    display_name: "&aA FOND !"
+    lores:
+      - "&c%player% devient sonic !"
     left_click_commands:
       - "[close]"
-      - "[player] say \"Incroyable, j'ai cliquer sur le bloc de terre !\""
+      - "[console] effect %player% speed 50 2"
