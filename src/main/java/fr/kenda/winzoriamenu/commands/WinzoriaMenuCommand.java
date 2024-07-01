@@ -99,7 +99,7 @@ public class WinzoriaMenuCommand implements CommandExecutor {
         }
         Player p = (Player) sender;
         YamlConfiguration config = guiManager.getGuis().get(menuName);
-        CustomGUI gui = new CustomGUI(config);
-        gui.create(p);
+        CustomGUI gui = new CustomGUI(p, config);
+        gui.create();
     }
 }

@@ -19,8 +19,10 @@ public class FileManager implements IManager {
     @Override
     public void register() {
         createFile("messages");
-        if (Config.getBoolean("generate_test_file"))
+        if (Config.getBoolean("generate_test_file")) {
             createFile("menus/test");
+            createFile("menus/test2");
+        }
 
     }
 

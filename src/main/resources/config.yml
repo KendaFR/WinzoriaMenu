@@ -13,3 +13,4 @@ generate_test_file: true
 #La liste des menus à enregistré dans le plugin
 menus:
   test: "test.yml"
+  test2: "test2.yml"

@@ -1,0 +1,41 @@
+menu_title: '&6&lMenu de Test2'
+size: 1
+open_command: test2
+
+#ATTENTION
+#L'ordre des appels va déterminer l'affichage des items.
+#Par exemple si le 'test' est avant la 'décoration', la décoration va prendre la priorité sur l'item à affiché
+items:
+  'decoration':
+    material: STAINED_GLASS
+    data: 5
+    amount: 1
+    slots:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+    display_name: "&cToutes les permissions sont déjà acheté"
+    view_requirement:
+      requirements:
+        already_buy:
+          type: "has permission"
+          requirement: "fly"
+  'buy-fly':
+    material: FEATHER
+    amount: 1
+    slots: 5
+    display_name: "&aAcheter le fly"
+    lores:
+      - ""
+      - "&aAchete le fly !!"
+      - ""
+    left_click_commands:
+      - "[close]"
+      - "[console] lp user %player% permission set fly"

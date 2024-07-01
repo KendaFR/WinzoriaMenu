@@ -2,6 +2,7 @@ package fr.kenda.winzoriamenu.gui;
 
 import fr.kenda.winzoriamenu.WinzoriaMenu;
 import fr.kenda.winzoriamenu.gui.data.ItemData;
+import fr.kenda.winzoriamenu.managers.GUIManager;
 import fr.kenda.winzoriamenu.utils.ItemBuilder;
 import fr.kenda.winzoriamenu.utils.Messages;
 import org.bukkit.Bukkit;
@@ -27,12 +28,13 @@ public class CustomGUI implements Listener {
     private final String title;
     private final int size;
     private final List<ItemData> itemData;
+    private final Player owner;
     private Inventory inventory = null;
-    private Player owner = null;
 
-    public CustomGUI(YamlConfiguration fileConfig) {
+    public CustomGUI(Player owner, YamlConfiguration fileConfig) {
         itemData = new ArrayList<>();
         configuration = fileConfig;
+        this.owner = owner;
         title = Messages.transformColor(fileConfig.getString("menu_title"));
 
         size = fileConfig.getInt("size") * 9;
@@ -55,17 +57,28 @@ public class CustomGUI implements Listener {
         final List<String> right_click = configuration.getStringList("items." + key + ".right_click_commands");
         final List<String> left_click = configuration.getStringList("items." + key + ".left_click_commands");
 
+        ItemData id;
         if (slots.isEmpty()) {
             final int slot = configuration.getInt("items." + key + ".slots");
-            itemData.add(new ItemData(displayName, material, slot, amount, data, right_click, left_click, lores));
+            id = new ItemData(owner, displayName, material, slot, amount, data, right_click, left_click, lores);
         } else
-            itemData.add(new ItemData(displayName, material, slots, amount, data, right_click, left_click, lores));
+            id = new ItemData(owner, displayName, material, slots, amount, data, right_click, left_click, lores);
+
+        final ConfigurationSection cs = configuration.getConfigurationSection("items." + key + ".view_requirement.requirements");
+        if (cs != null) {
+            for (String csKey : cs.getKeys(false)) {
+                String type = "items." + key + ".view_requirement.requirements." + csKey + ".type";
+                String requirement = "items." + key + ".view_requirement.requirements." + csKey + ".requirement";
+                id.addRequirement(configuration.getString(type), configuration.getString(requirement));
+            }
+        }
+        if (id.canShowItem())
+            itemData.add(id);
     }
 
-    public void create(Player player) {
-        owner = player;
-        inventory = Bukkit.createInventory(player, size, title);
-        player.openInventory(inventory);
+    public void create() {
+        inventory = Bukkit.createInventory(owner, size, title);
+        owner.openInventory(inventory);
 
         openMenu();
     }
@@ -167,7 +180,8 @@ public class CustomGUI implements Listener {
                 break;
             case "[openguimenu]":
                 close();
-                create(owner);
+                CustomGUI gui = new CustomGUI(owner, WinzoriaMenu.getInstance().getManager(GUIManager.class).getGuis().get(cmd));
+                gui.create();
                 break;
         }
     }

@@ -58,8 +58,8 @@ public class GUIManager implements IManager {
 
             Player player = (Player) sender;
             YamlConfiguration config = guis.get(cmd);
-            CustomGUI gui = new CustomGUI(config);
-            gui.create(player);
+            CustomGUI gui = new CustomGUI(player, config);
+            gui.create();
             return true;
         });
     }

@@ -87,3 +87,31 @@ items:
     left_click_commands:
       - "[close]"
       - "[console] effect %player% speed 50 2"
+  'fly-nopermission':
+    material: FEATHER
+    amount: 1
+    slots: 12
+    display_name: "&cAcheter le vol ?"
+    lores:
+      - "&fIl faut que je puisse voler !"
+    view_requirement:
+      requirements:
+        not_showing:
+          type: "!has permission"
+          requirement: "fly"
+    left_click_commands:
+      - "[openguimenu] test2"
+  'fly-permission':
+    material: FEATHER
+    amount: 1
+    slots: 12
+    display_name: "&aJE VOLE !"
+    lores:
+      - "&fJe peux voler !"
+    view_requirement:
+      requirements:
+        showing:
+          type: "has permission"
+          requirement: "fly"
+    left_click_commands:
+      - "[console] gamemode creative %player%"
