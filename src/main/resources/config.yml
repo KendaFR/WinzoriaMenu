@@ -7,10 +7,11 @@
 
 prefix: "&a[WinzoriaMenu]"
 
-#Générer le fichier de test
-generate_test_file: true
+#Générer le fichier d'example
+generate_example_file: true
 
 #La liste des menus à enregistré dans le plugin
 menus:
-  test: "test.yml"
-  test2: "test2.yml"
+  example: "example.yml"
+  example2: "example2.yml"
+  example3: "example3.yml"

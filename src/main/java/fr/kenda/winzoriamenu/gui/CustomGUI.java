@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class CustomGUI implements Listener {
@@ -48,33 +50,45 @@ public class CustomGUI implements Listener {
     }
 
     private void createItemData(String key) {
-        final Material material = Material.valueOf(configuration.getString("items." + key + ".material"));
-        final int amount = configuration.getInt("items." + key + ".amount");
-        final int data = configuration.getInt("items." + key + ".data");
-        final List<Integer> slots = configuration.getIntegerList("items." + key + ".slots");
-        final String displayName = configuration.getString("items." + key + ".display_name");
-        final List<String> lores = configuration.getStringList("items." + key + ".lores");
-        final List<String> right_click = configuration.getStringList("items." + key + ".right_click_commands");
-        final List<String> left_click = configuration.getStringList("items." + key + ".left_click_commands");
+        String itemKey = "items." + key + ".";
 
-        ItemData id;
-        if (slots.isEmpty()) {
-            final int slot = configuration.getInt("items." + key + ".slots");
-            id = new ItemData(owner, displayName, material, slot, amount, data, right_click, left_click, lores);
-        } else
-            id = new ItemData(owner, displayName, material, slots, amount, data, right_click, left_click, lores);
+        final String displayName = configuration.getString(itemKey + "display_name");
+        final Material material = Material.valueOf(configuration.getString(itemKey + "material"));
+        final int slot = configuration.getInt(itemKey + "slots");
+        final List<Integer> slots = configuration.getIntegerList(itemKey + "slots");
+        final int amount = configuration.getInt(itemKey + "amount");
 
-        final ConfigurationSection cs = configuration.getConfigurationSection("items." + key + ".view_requirement.requirements");
+        ItemData id = slots.isEmpty() ?
+                new ItemData(owner, displayName, material, slot, null, amount)
+                :
+                new ItemData(owner, displayName, material, -1, slots, amount);
+
+        final int data = configuration.getInt(itemKey + "data");
+        if (data != 0)
+            id.setData(data);
+
+        setListIfNotEmpty(id::setLores, itemKey + "lores");
+        setListIfNotEmpty(id::setEnchantments, itemKey + "enchantments");
+        setListIfNotEmpty(id::setRightClickCommands, itemKey + "right_click_commands");
+        setListIfNotEmpty(id::setLeftClickCommands, itemKey + "left_click_commands");
+
+        final ConfigurationSection cs = configuration.getConfigurationSection(itemKey + "view_requirement.requirements");
         if (cs != null) {
             for (String csKey : cs.getKeys(false)) {
-                String type = "items." + key + ".view_requirement.requirements." + csKey + ".type";
-                String requirement = "items." + key + ".view_requirement.requirements." + csKey + ".requirement";
-                id.addRequirement(configuration.getString(type), configuration.getString(requirement));
+                String requirementKey = itemKey + "view_requirement.requirements." + csKey + ".";
+                id.addRequirement(configuration.getString(requirementKey + "type"), configuration.getString(requirementKey + "requirement"));
             }
         }
         if (id.canShowItem())
             itemData.add(id);
     }
+
+    private void setListIfNotEmpty(Consumer<List<String>> setter, String key) {
+        final List<String> list = configuration.getStringList(key);
+        if (!list.isEmpty())
+            setter.accept(list);
+    }
+
 
     public void create() {
         inventory = Bukkit.createInventory(owner, size, title);
@@ -91,24 +105,49 @@ public class CustomGUI implements Listener {
         ItemStack[] content = new ItemStack[size];
 
         for (ItemData item : itemData) {
-            List<String> lores = item.getLores().stream()
-                    .map(s -> Messages.transformColor(s.replace("%player%", owner.getName())))
-                    .collect(Collectors.toList());
-
-            ItemBuilder itemBuilder = new ItemBuilder(item.getMaterial(), item.getAmount(), item.getData())
+            ItemBuilder itemBuilder;
+            itemBuilder = item.getData() != 0 ?
+                new ItemBuilder(item.getMaterial(), item.getAmount(), item.getData())
                     .setName(item.getName())
-                    .setLore(lores);
+            :
+                new ItemBuilder(item.getMaterial(), item.getAmount())
+                        .setName(item.getName());
 
+            if(item.getLores() != null) {
+                List<String> lores = item.getLores().stream()
+                        .map(s -> Messages.transformColor(s.replace("%player%", owner.getName())))
+                        .collect(Collectors.toList());
+                        itemBuilder.setLore(lores);
+            }
+
+            if(item.getEnchantments() != null) {
+                for (String enchant : item.getEnchantments()) {
+                    String[] enchantValue = enchant.split(";");
+                    try {
+                        Enchantment ench = Enchantment.getByName(enchantValue[0]);
+                        itemBuilder.addUnsafeEnchantment(ench, Integer.parseInt(enchantValue[1]));
+                    } catch (NullPointerException | NumberFormatException e) {
+                        throw new RuntimeException("Une erreur s'est produite lors de la création de l'item " + item.getName() + ". L'enchantement ou la valeur n'est pas correct(e).", e);
+                    }
+                }
+            }
+
+            ItemStack itemStack = itemBuilder.toItemStack();
             if (item.getSlots() == null) {
-                content[item.getUniqueSlot()] = itemBuilder.toItemStack();
+                final int slot = item.getUniqueSlot();
+                if(slot > size)
+                    continue;
+                content[slot] = itemStack;
             } else {
                 for (int slot : item.getSlots()) {
-                    content[slot] = itemBuilder.toItemStack();
+                    if(slot > size) continue;
+                    content[slot] = itemStack;
                 }
             }
         }
         return content;
     }
+
 
 
     public void close() {

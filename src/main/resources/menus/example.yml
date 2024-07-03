@@ -30,7 +30,6 @@
 
 menu_title: '&6&lMenu de Test'
 size: 3
-open_command: test
 
 #ATTENTION
 #L'ordre des appels va déterminer l'affichage des items.
@@ -100,18 +99,13 @@ items:
           type: "!has permission"
           requirement: "fly"
     left_click_commands:
-      - "[openguimenu] test2"
-  'fly-permission':
-    material: FEATHER
+      - "[openguimenu] example2"
+  'give-sword':
+    material: DIAMOND_SWORD
     amount: 1
-    slots: 12
-    display_name: "&aJE VOLE !"
+    slots: 14
+    display_name: "&aVoir toutes les épées"
     lores:
-      - "&fJe peux voler !"
-    view_requirement:
-      requirements:
-        showing:
-          type: "has permission"
-          requirement: "fly"
+      - "&fVoir toute les épées du pack ?"
     left_click_commands:
-      - "[console] gamemode creative %player%"
+      - "[openguimenu] example3"

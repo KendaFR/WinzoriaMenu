@@ -1,0 +1,19 @@
+menu_title: "&6&lMenu d'exemple 3"
+size: 1
+items:
+  'sword_fire':
+    material: DIAMOND_SWORD
+    amount: 1
+    slots: 0
+    display_name: "&aEpée aura de feu"
+    enchantments:
+      - DURABILITY;1
+      - FIRE_ASPECT;1
+  'sword_sharpness':
+    material: DIAMOND_SWORD
+    amount: 1
+    slots: 1
+    display_name: "&aEpée aura de dégâts"
+    enchantments:
+      - DURABILITY;1
+      - DAMAGE_ALL;3

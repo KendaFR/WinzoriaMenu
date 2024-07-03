@@ -28,7 +28,7 @@ public final class WinzoriaMenu extends JavaPlugin {
         if (manager.getManager(GUIManager.class).getGuis().isEmpty())
             Bukkit.getConsoleSender().sendMessage(Messages.getPrefix() + Messages.transformColor("&cLes GUI ont été créés, mais pas chargés. Merci de faire /wm reload pour actualiser la liste."));
 
-
+manager.getManager(GUIManager.class).reloadGUI();
         //check de release
     }
 

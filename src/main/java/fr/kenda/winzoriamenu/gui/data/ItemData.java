@@ -17,50 +17,33 @@ public class ItemData {
     private final List<Integer> slots;
     private final int uniqueSlot;
     private final int amount;
-    private final byte data;
-    private final List<String> rightClickCommands;
-    private final List<String> leftClickCommands;
-    private final List<String> lores;
-    private final HashMap<String, List<String>> requirements;
 
-    public ItemData(Player owner, String name, Material material, List<Integer> slots, int amount, int data, List<String> rightClickCommands, List<String> leftClickCommands, List<String> lores) {
+    //optional
+    private byte data;
+    private List<String> rightClickCommands;
+    private List<String> leftClickCommands;
+    private List<String> lores;
+    private List<String> enchantments;
+    private HashMap<String, List<String>> requirements;
+
+    public ItemData(Player owner, String name, Material material, int uniqueSlot, List<Integer> slots, int amount) {
+        this.owner = owner;
         this.name = Messages.transformColor(name.replace("%prefix%", Messages.getPrefix()));
         this.material = material;
         this.slots = slots;
-        this.uniqueSlot = -1;
-        this.amount = amount;
-        this.data = (byte) data;
-        this.rightClickCommands = rightClickCommands;
-        this.leftClickCommands = leftClickCommands;
-        this.lores = lores;
-        this.requirements = new HashMap<>();
-        this.owner = owner;
-
-        lores.replaceAll(s -> Messages.transformColor(s.replace("%prefix%", Messages.getPrefix())));
-    }
-
-    public ItemData(Player owner, String name, Material material, int uniqueSlot, int amount, int data, List<String> rightClickCommands, List<String> leftClickCommands, List<String> lores) {
-        this.name = Messages.transformColor(name.replace("%prefix%", Messages.getPrefix()));
-        this.material = material;
-        this.slots = null;
         this.uniqueSlot = uniqueSlot;
-        this.data = (byte) data;
         this.amount = amount;
-        this.rightClickCommands = rightClickCommands;
-        this.leftClickCommands = leftClickCommands;
-        this.lores = lores;
-        this.requirements = new HashMap<>();
-        this.owner = owner;
-
-        lores.replaceAll(s -> Messages.transformColor(s.replace("%prefix%", Messages.getPrefix())));
     }
 
     public void addRequirement(String type, String requirement) {
-        if (this.requirements.get(type) != null)
-            this.requirements.get(type).add(requirement);
+        if(requirements == null)
+            requirements = new HashMap<>();
+
+        if (requirements.get(type) != null)
+            requirements.get(type).add(requirement);
         else {
-            this.requirements.put(type, new ArrayList<>());
-            this.requirements.get(type).add(requirement);
+            requirements.put(type, new ArrayList<>());
+            requirements.get(type).add(requirement);
         }
     }
 
@@ -88,6 +71,10 @@ public class ItemData {
         return amount;
     }
 
+    public List<String> getEnchantments() {
+        return enchantments;
+    }
+
     public List<String> getLores() {
         return lores;
     }
@@ -101,6 +88,8 @@ public class ItemData {
     }
 
     public boolean canShowItem() {
+        if(requirements == null) return true;
+
         for (Map.Entry<String, List<String>> entry : requirements.entrySet()) {
             String type = entry.getKey();
             List<String> permissions = entry.getValue();
@@ -121,4 +110,24 @@ public class ItemData {
         return true;
     }
 
+    public void setData(final int data) {
+        this.data = (byte) data;
+    }
+
+    public void setRightClickCommands(final List<String> rightClickCommands) {
+        this.rightClickCommands = rightClickCommands;
+    }
+
+    public void setLeftClickCommands(final List<String> leftClickCommands) {
+        this.leftClickCommands = leftClickCommands;
+    }
+
+    public void setLores(List<String> lores) {
+        lores.replaceAll(s -> Messages.transformColor(s.replace("%prefix%", Messages.getPrefix())));
+        this.lores = lores;
+    }
+
+    public void setEnchantments(final List<String> enchantments) {
+        this.enchantments = enchantments;
+    }
 }
