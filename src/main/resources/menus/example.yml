@@ -17,6 +17,9 @@
 #   lore: La description qui sera affichée (optionnel)
 #   right_click_commands: La/Les commande(s) à effectuer lors d'un clic droit (optionnel)
 #   left_click_commands: La/Les commande(s) à effectuer lors d'un clic gauche (optionnel)
+#   view_requirement: La condition pour voir l'item dans l'inventaire (optionnel)
+#   view_requirement: La condition pour voir l'item dans l'inventaire (optionnel)
+#   left_click_requirement: La condition pour cliquer sur l'item dans l'inventaire (optionnel)
 #
 #===================[PLACEHOLDER]============================
 # Voici la liste des placeholder à pouvoir mettre dans les commandes:
@@ -25,11 +28,11 @@
 # [openguimenu]: Ouvre un autre menu
 # [player]: Le joueur execute une commande
 # [console]: la console execute une commande
-# %player%: On cible le joueur
-# %prefix%: Le prefix du plugin
+
+# {prefix}: Le prefix du plugin
 
 menu_title: '&6&lMenu de Test'
-size: 3
+size: 27
 
 #ATTENTION
 #L'ordre des appels va déterminer l'affichage des items.
@@ -59,11 +62,11 @@ items:
       - 24
       - 25
       - 26
-    display_name: "%prefix%"
+    display_name: "{prefix}"
   'test':
     material: DIRT
     amount: 1
-    slots: 10
+    slot: 10
     display_name: "&aUn bloc de test ?"
     lores:
       - ""
@@ -71,7 +74,7 @@ items:
       - ""
     right_click_commands:
       - "[close]"
-      - "[console] tell %player% Tu as vu, je suis un bloc de terre !"
+      - "[console] tell %player_name% Tu as vu, je suis un bloc de terre !"
     left_click_commands:
       - "[close]"
       - "[player] say \"Incroyable, j'ai cliquer sur le bloc de terre !\""
@@ -79,17 +82,17 @@ items:
     material: POTION
     amount: 1
     data: 66
-    slots: 11
+    slot: 11
     display_name: "&aA FOND !"
     lores:
       - "&c%player% devient sonic !"
     left_click_commands:
       - "[close]"
-      - "[console] effect %player% speed 50 2"
+      - "[console] effect %player_name% speed 50 2"
   'fly-nopermission':
     material: FEATHER
     amount: 1
-    slots: 12
+    slot: 12
     display_name: "&cAcheter le vol ?"
     lores:
       - "&fIl faut que je puisse voler !"
@@ -103,7 +106,7 @@ items:
   'give-sword':
     material: DIAMOND_SWORD
     amount: 1
-    slots: 14
+    slot: 14
     display_name: "&aVoir toutes les épées"
     lores:
       - "&fVoir toute les épées du pack ?"

@@ -1,19 +1,26 @@
 menu_title: "&6&lMenu d'exemple 3"
-size: 1
+size: 9
 items:
   'sword_fire':
     material: DIAMOND_SWORD
     amount: 1
-    slots: 0
+    slot: 0
     display_name: "&aEpée aura de feu"
     enchantments:
       - DURABILITY;1
       - FIRE_ASPECT;1
   'sword_sharpness':
-    material: DIAMOND_SWORD
+    material: IRON_HELMET
     amount: 1
-    slots: 1
-    display_name: "&aEpée aura de dégâts"
-    enchantments:
-      - DURABILITY;1
-      - DAMAGE_ALL;3
+    slot: 1
+    display_name: "&aSe mettre en vanish"
+    left_click_requirement:
+      requirements:
+        javascript:
+          type: "condition"
+          requirement: "%essentials_vanished% == no"
+      deny_message: "&cTu ne peux pas effectuer cette action car tu es en vanish."
+    left_click_commands:
+      - "[close]"
+      - "[player] vanish"
+      - "[message] Tu es passé invisible !"

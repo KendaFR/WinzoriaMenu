@@ -4,6 +4,10 @@ import fr.kenda.winzoriamenu.WinzoriaMenu;
 import fr.kenda.winzoriamenu.gui.CustomGUI;
 import fr.kenda.winzoriamenu.managers.GUIManager;
 import fr.kenda.winzoriamenu.utils.Messages;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -40,12 +44,12 @@ public class WinzoriaMenuCommand implements CommandExecutor {
                 String target = args[2];
 
                 if (!guiManager.isMenuExist(menu)) {
-                    commandSender.sendMessage(Messages.transformColor("&cLe menu " + menu + " n'existe pas."));
+                    commandSender.sendMessage(Messages.getMessage("menu_doesnt_exist", "{menu}", menu));
                     return false;
                 }
                 Player t = Bukkit.getPlayer(target);
                 if (t == null) {
-                    commandSender.sendMessage(Messages.transformColor("&cLe joueur " + target + " n'est pas connecté."));
+                    commandSender.sendMessage(Messages.getMessage("player_doesnt_exist", "{player}", target));
                     return false;
                 }
 
@@ -64,7 +68,7 @@ public class WinzoriaMenuCommand implements CommandExecutor {
                 return true;
             case "reload":
                 guiManager.reloadGUI();
-                commandSender.sendMessage(Messages.getPrefix() + Messages.transformColor("&a" + guiManager.getGuis().size() + " GUIs chargés."));
+                commandSender.sendMessage(Messages.getPrefix() + Messages.getMessage("menu_load", "{number}", String.valueOf(guiManager.getGuis().size())));
                 return true;
             default:
                 if (guiManager.isMenuExist(action)) {
@@ -78,7 +82,13 @@ public class WinzoriaMenuCommand implements CommandExecutor {
     private void sendList(CommandSender sender) {
         sender.sendMessage(Messages.transformColor("&8&m========== [ " + Messages.getPrefix() + "&8&m] =========="));
         for (String guiName : guiManager.getGuis().keySet()) {
-            sender.sendMessage(Messages.transformColor("&e" + guiName));
+            TextComponent text = new TextComponent(Messages.getMessage("menu_list", "{menu}", guiName));
+            text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Messages.getMessage("menu_list_hover")).create()));
+            text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + guiName));
+            if (sender instanceof Player)
+                ((Player) sender).spigot().sendMessage(text);
+            else
+                sender.sendMessage(Messages.getMessage("menu_list", "{menu}", guiName));
         }
         sender.sendMessage(Messages.transformColor("&8&m========== [ " + Messages.getPrefix() + "&8&m] =========="));
     }

@@ -26,7 +26,7 @@ public class GUIManager implements IManager {
         final String prefix = Messages.getPrefix();
         final FileConfiguration config = instance.getConfig();
 
-        printMessage(console, prefix);
+        //printMessage(console, prefix);
 
         config.getConfigurationSection("menus").getKeys(false).forEach(key -> {
             String fileName = config.getString("menus." + key);
@@ -42,8 +42,6 @@ public class GUIManager implements IManager {
             registerCommand(key);
             console.sendMessage(prefix + Messages.transformColor("&8&oChargement du fichier: " + fileName));
         });
-
-        printMessage(console, prefix);
     }
 
     private void printMessage(ConsoleCommandSender console, String prefix) {
@@ -69,10 +67,15 @@ public class GUIManager implements IManager {
     }
 
     public void reloadGUI() {
+        final ConsoleCommandSender console = Bukkit.getConsoleSender();
+        final String prefix = Messages.getPrefix();
+
+        printMessage(console, prefix);
         unregisterCommands();
         guis.clear();
         instance.reloadConfig();
         register();
+        printMessage(console, prefix);
     }
 
     public Map<String, YamlConfiguration> getGuis() {

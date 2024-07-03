@@ -6,3 +6,5 @@ description: Plugin de menu basé sur DeluxeMenu
 commands:
   wm:
     description: base command pour ouvrir un menu
+
+softdepend: [PlaceholderAPI]

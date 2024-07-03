@@ -39,7 +39,7 @@ public class CustomGUI implements Listener {
         this.owner = owner;
         title = Messages.transformColor(fileConfig.getString("menu_title"));
 
-        size = fileConfig.getInt("size") * 9;
+        size = fileConfig.getInt("size");
 
         final ConfigurationSection items = fileConfig.getConfigurationSection("items");
         for (String key : items.getKeys(false)) {
@@ -51,34 +51,45 @@ public class CustomGUI implements Listener {
 
     private void createItemData(String key) {
         String itemKey = "items." + key + ".";
+        ConfigurationSection cs;
 
-        final String displayName = configuration.getString(itemKey + "display_name");
-        final Material material = Material.valueOf(configuration.getString(itemKey + "material"));
-        final int slot = configuration.getInt(itemKey + "slots");
+        final Material material = Material.valueOf(configuration.getString(itemKey + "material").toUpperCase());
         final List<Integer> slots = configuration.getIntegerList(itemKey + "slots");
-        final int amount = configuration.getInt(itemKey + "amount");
+        final int amount = configuration.getInt(itemKey + "amount", 1);
 
-        ItemData id = slots.isEmpty() ?
-                new ItemData(owner, displayName, material, slot, null, amount)
-                :
-                new ItemData(owner, displayName, material, -1, slots, amount);
+        ItemData id = new ItemData(owner, material, slots.isEmpty() ? configuration.getInt(itemKey + "slot") : -1, slots.isEmpty() ? null : slots, amount);
 
-        final int data = configuration.getInt(itemKey + "data");
-        if (data != 0)
-            id.setData(data);
+        id.setData(configuration.getInt(itemKey + "data"));
+        id.setName(configuration.getString(itemKey + "display_name"));
 
         setListIfNotEmpty(id::setLores, itemKey + "lores");
         setListIfNotEmpty(id::setEnchantments, itemKey + "enchantments");
         setListIfNotEmpty(id::setRightClickCommands, itemKey + "right_click_commands");
         setListIfNotEmpty(id::setLeftClickCommands, itemKey + "left_click_commands");
 
-        final ConfigurationSection cs = configuration.getConfigurationSection(itemKey + "view_requirement.requirements");
-        if (cs != null) {
+        if ((cs = configuration.getConfigurationSection(itemKey + "view_requirement.requirements")) != null) {
             for (String csKey : cs.getKeys(false)) {
-                String requirementKey = itemKey + "view_requirement.requirements." + csKey + ".";
-                id.addRequirement(configuration.getString(requirementKey + "type"), configuration.getString(requirementKey + "requirement"));
+                id.addRequirement(configuration.getString(itemKey + "view_requirement.requirements." + csKey + ".type"),
+                        configuration.getString(itemKey + "view_requirement.requirements." + csKey + ".requirement"));
             }
         }
+
+        if ((cs = configuration.getConfigurationSection(itemKey + "left_click_requirement.requirements")) != null) {
+            id.setDenyLeftClickMessage(configuration.getString(itemKey + "left_click_requirement.deny_message"));
+            for (String csKey : cs.getKeys(false)) {
+                id.addClickRequirement(configuration.getString(itemKey + "left_click_requirement.requirements." + csKey + ".type"),
+                        configuration.getString(itemKey + "left_click_requirement.requirements." + csKey + ".requirement"));
+            }
+        }
+
+        if ((cs = configuration.getConfigurationSection(itemKey + "right_click_requirement.requirements")) != null) {
+            id.setDenyRightClickMessage(configuration.getString(itemKey + "right_click_requirement.deny_message"));
+            for (String csKey : cs.getKeys(false)) {
+                id.addClickRequirement(configuration.getString(itemKey + "right_click_requirement.requirements." + csKey + ".type"),
+                        configuration.getString(itemKey + "right_click_requirement.requirements." + csKey + ".requirement"));
+            }
+        }
+
         if (id.canShowItem())
             itemData.add(id);
     }
@@ -107,20 +118,20 @@ public class CustomGUI implements Listener {
         for (ItemData item : itemData) {
             ItemBuilder itemBuilder;
             itemBuilder = item.getData() != 0 ?
-                new ItemBuilder(item.getMaterial(), item.getAmount(), item.getData())
-                    .setName(item.getName())
-            :
-                new ItemBuilder(item.getMaterial(), item.getAmount())
-                        .setName(item.getName());
+                    new ItemBuilder(item.getMaterial(), item.getAmount(), item.getData())
+                            .setName(item.getName())
+                    :
+                    new ItemBuilder(item.getMaterial(), item.getAmount())
+                            .setName(item.getName());
 
-            if(item.getLores() != null) {
+            if (item.getLores() != null) {
                 List<String> lores = item.getLores().stream()
                         .map(s -> Messages.transformColor(s.replace("%player%", owner.getName())))
                         .collect(Collectors.toList());
-                        itemBuilder.setLore(lores);
+                itemBuilder.setLore(lores);
             }
 
-            if(item.getEnchantments() != null) {
+            if (item.getEnchantments() != null) {
                 for (String enchant : item.getEnchantments()) {
                     String[] enchantValue = enchant.split(";");
                     try {
@@ -135,19 +146,18 @@ public class CustomGUI implements Listener {
             ItemStack itemStack = itemBuilder.toItemStack();
             if (item.getSlots() == null) {
                 final int slot = item.getUniqueSlot();
-                if(slot > size)
+                if (slot > size)
                     continue;
                 content[slot] = itemStack;
             } else {
                 for (int slot : item.getSlots()) {
-                    if(slot > size) continue;
+                    if (slot > size) continue;
                     content[slot] = itemStack;
                 }
             }
         }
         return content;
     }
-
 
 
     public void close() {
@@ -175,6 +185,8 @@ public class CustomGUI implements Listener {
 
         Material mat = current.getType();
         ItemData item = getItemFromMaterial(mat);
+        if (item == null) return;
+
         ClickType clickType = e.getClick();
         if (clickType == ClickType.RIGHT || clickType == ClickType.LEFT)
             performAction(item, clickType);
@@ -194,6 +206,13 @@ public class CustomGUI implements Listener {
         }
 
         if (commands != null) {
+            if (!data.canClick()) {
+                owner.sendMessage(Messages.getPrefix() + (clickType == ClickType.LEFT ?
+                        Messages.transformColor(data.getDenyLeftClickMessage())
+                        :
+                        Messages.transformColor(data.getDenyRightClickMessage())));
+                return;
+            }
             for (String command : commands) {
                 executeCommand(command);
             }
@@ -203,24 +222,32 @@ public class CustomGUI implements Listener {
 
     private void executeCommand(String command) {
         String prefix = command.split(" ")[0];
-        String cmd = "";
+        String args = "";
         if (command.contains(" "))
-            cmd = command.substring(command.indexOf(" ") + 1).replace("%player%", owner.getName());
+            args = command.substring(command.indexOf(" ") + 1).replace("%player%", owner.getName());
 
         switch (prefix) {
             case "[close]":
                 close();
                 break;
             case "[console]":
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), args);
                 break;
             case "[player]":
-                Bukkit.dispatchCommand(owner, cmd);
+                Bukkit.dispatchCommand(owner, args);
                 break;
             case "[openguimenu]":
                 close();
-                CustomGUI gui = new CustomGUI(owner, WinzoriaMenu.getInstance().getManager(GUIManager.class).getGuis().get(cmd));
+                YamlConfiguration fileConfig = WinzoriaMenu.getInstance().getManager(GUIManager.class).getGuis().get(args);
+                if (fileConfig == null) {
+                    owner.sendMessage(Messages.getMessage("menu_doesnt_exist", "{menu}", args));
+                    break;
+                }
+                CustomGUI gui = new CustomGUI(owner, fileConfig);
                 gui.create();
+                break;
+            case "[message]":
+                owner.sendMessage(args);
                 break;
         }
     }

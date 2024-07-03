@@ -6,6 +6,8 @@ import fr.kenda.winzoriamenu.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.logging.Level;
+
 public final class WinzoriaMenu extends JavaPlugin {
 
     private static WinzoriaMenu instance;
@@ -25,10 +27,17 @@ public final class WinzoriaMenu extends JavaPlugin {
         manager = new Manager();
         manager.register();
 
-        if (manager.getManager(GUIManager.class).getGuis().isEmpty())
+        /*if (manager.getManager(GUIManager.class).getGuis().isEmpty())
             Bukkit.getConsoleSender().sendMessage(Messages.getPrefix() + Messages.transformColor("&cLes GUI ont été créés, mais pas chargés. Merci de faire /wm reload pour actualiser la liste."));
+        */
 
-manager.getManager(GUIManager.class).reloadGUI();
+        GUIManager guiManager = manager.getManager(GUIManager.class);
+        if (guiManager.getGuis().isEmpty())
+            guiManager.reloadGUI();
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null)
+            getLogger().log(Level.SEVERE, "Le plugin placeholderapi n'as pas été trouver. Certaines fonctionnalités pourraient entraîner des erreurs.");
+
         //check de release
     }
 

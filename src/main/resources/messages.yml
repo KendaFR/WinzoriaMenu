@@ -1,0 +1,5 @@
+menu_doesnt_exist: "&cLe menu {menu} n'existe pas."
+player_doesnt_exist: "&cLe joueur {player} n'est pas connecté."
+menu_load: "&a{number} GUIs chargés."
+menu_list: "&e {menu}"
+menu_list_hover: "&aOuvrir le menu"
