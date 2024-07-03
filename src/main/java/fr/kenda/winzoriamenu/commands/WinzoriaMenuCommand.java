@@ -3,11 +3,8 @@ package fr.kenda.winzoriamenu.commands;
 import fr.kenda.winzoriamenu.WinzoriaMenu;
 import fr.kenda.winzoriamenu.gui.CustomGUI;
 import fr.kenda.winzoriamenu.managers.GUIManager;
+import fr.kenda.winzoriamenu.utils.ClickableText;
 import fr.kenda.winzoriamenu.utils.Messages;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -81,15 +78,8 @@ public class WinzoriaMenuCommand implements CommandExecutor {
 
     private void sendList(CommandSender sender) {
         sender.sendMessage(Messages.transformColor("&8&m========== [ " + Messages.getPrefix() + "&8&m] =========="));
-        for (String guiName : guiManager.getGuis().keySet()) {
-            TextComponent text = new TextComponent(Messages.getMessage("menu_list", "{menu}", guiName));
-            text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Messages.getMessage("menu_list_hover")).create()));
-            text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + guiName));
-            if (sender instanceof Player)
-                ((Player) sender).spigot().sendMessage(text);
-            else
-                sender.sendMessage(Messages.getMessage("menu_list", "{menu}", guiName));
-        }
+        for (String guiName : guiManager.getGuis().keySet())
+            ClickableText.makeTextHover(Messages.getMessage("menu_list", "{menu}", guiName), Messages.getMessage("menu_list_hover"), "/" + guiName, sender);
         sender.sendMessage(Messages.transformColor("&8&m========== [ " + Messages.getPrefix() + "&8&m] =========="));
     }
 
