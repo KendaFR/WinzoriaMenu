@@ -6,14 +6,6 @@ Un plugin basé sur [DeluxeMenu](https://github.com/HelpChat/DeluxeMenus).
 Fait pour le serveur [Winzoria](https://discord.gg/ZXahsHYfpZ)
 
 
-#WinzoriaMenu
-
-Un plugin basé sur [DeluxeMenu](https://github.com/HelpChat/DeluxeMenus).
-
-Fait pour le serveur [Winzoria](https://discord.gg/ZXahsHYfpZ)
-
-
-
 
 ## Installation
 
