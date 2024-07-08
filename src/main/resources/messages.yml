@@ -1,3 +1,4 @@
+no_permission: "&cVous n'avez pas la permission de faire cette commande"
 menu_doesnt_exist: "&cLe menu {menu} n'existe pas."
 player_doesnt_exist: "&cLe joueur {player} n'est pas connecté."
 menu_load: "&a{number} GUIs chargés."

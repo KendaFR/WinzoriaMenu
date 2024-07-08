@@ -51,6 +51,7 @@ public class GUIManager implements IManager {
     private void registerCommand(String cmd) {
         WMCommand.registerCommand(cmd, (sender, command, label, args) -> {
             if (!(sender instanceof Player)) {
+                Bukkit.getConsoleSender().sendMessage(Messages.transformColor("&cSeul un joueur peut faire cette commande."));
                 return false;
             }
 

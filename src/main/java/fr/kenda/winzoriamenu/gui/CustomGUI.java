@@ -5,6 +5,7 @@ import fr.kenda.winzoriamenu.gui.data.ItemData;
 import fr.kenda.winzoriamenu.managers.GUIManager;
 import fr.kenda.winzoriamenu.utils.ItemBuilder;
 import fr.kenda.winzoriamenu.utils.Messages;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -164,9 +165,9 @@ public class CustomGUI implements Listener {
         owner.closeInventory();
     }
 
-    private ItemData getItemFromMaterial(Material mat) {
+    private ItemData getItemFromSlot(int slot) {
         for (ItemData data : itemData) {
-            if (data.getMaterial() == mat) return data;
+            if (data.getSlots() != null && data.getSlots().contains(slot) || data.getUniqueSlot() == slot) return data;
         }
         return null;
     }
@@ -183,8 +184,7 @@ public class CustomGUI implements Listener {
 
         e.setCancelled(true);
 
-        Material mat = current.getType();
-        ItemData item = getItemFromMaterial(mat);
+        ItemData item = getItemFromSlot(e.getSlot());
         if (item == null) return;
 
         ClickType clickType = e.getClick();
@@ -207,10 +207,11 @@ public class CustomGUI implements Listener {
 
         if (commands != null) {
             if (!data.canClick()) {
-                owner.sendMessage(Messages.getPrefix() + (clickType == ClickType.LEFT ?
-                        Messages.transformColor(data.getDenyLeftClickMessage())
-                        :
-                        Messages.transformColor(data.getDenyRightClickMessage())));
+                if(clickType == ClickType.LEFT && data.getDenyLeftClickMessage() != null || clickType == ClickType.RIGHT && data.getDenyRightClickMessage() != null)
+                    owner.sendMessage(Messages.getPrefix() + (clickType == ClickType.LEFT ?
+                            Messages.transformColor(data.getDenyLeftClickMessage())
+                            :
+                            Messages.transformColor(data.getDenyRightClickMessage())));
                 return;
             }
             for (String command : commands) {
@@ -224,7 +225,7 @@ public class CustomGUI implements Listener {
         String prefix = command.split(" ")[0];
         String args = "";
         if (command.contains(" "))
-            args = command.substring(command.indexOf(" ") + 1).replace("%player%", owner.getName());
+            args = PlaceholderAPI.setPlaceholders(owner, command.substring(command.indexOf(" ") + 1));
 
         switch (prefix) {
             case "[close]":
@@ -247,7 +248,7 @@ public class CustomGUI implements Listener {
                 gui.create();
                 break;
             case "[message]":
-                owner.sendMessage(args);
+                owner.sendMessage(Messages.transformColor(args));
                 break;
         }
     }

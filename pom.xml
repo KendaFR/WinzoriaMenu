@@ -6,7 +6,7 @@
 
   <groupId>fr.kenda</groupId>
   <artifactId>WinzoriaMenu</artifactId>
-  <version>1.0-beta</version>
+  <version>1.0</version>
   <packaging>jar</packaging>
 
   <name>WinzoriaMenu</name>

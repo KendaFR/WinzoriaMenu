@@ -1,5 +1,5 @@
 package fr.kenda.winzoriamenu.utils;
 
 public class Permission {
-    public static final String PERMISSION = "admin";
+    public static final String RELOAD = "winzoriamenu.reload";
 }

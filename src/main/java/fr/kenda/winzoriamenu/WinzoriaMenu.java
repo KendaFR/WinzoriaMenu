@@ -47,7 +47,7 @@ public final class WinzoriaMenu extends JavaPlugin {
                     String prefix = Messages.getPrefix();
                     String newVersionMessage = prefix + Messages.transformColor("&aUne nouvelle version du plugin est disponible.");
                     String url = "https://github.com/KendaFR/WinzoriaMenu/releases/tag/Latest";
-                    String clickableText = Messages.transformColor("&a" + url);
+                    String clickableText = Messages.transformColor("&7&o" + url);
 
                     Bukkit.getConsoleSender().sendMessage(newVersionMessage);
                     Bukkit.getConsoleSender().sendMessage(prefix + "&a" + url);

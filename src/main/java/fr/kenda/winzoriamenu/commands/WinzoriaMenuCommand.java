@@ -5,6 +5,7 @@ import fr.kenda.winzoriamenu.gui.CustomGUI;
 import fr.kenda.winzoriamenu.managers.GUIManager;
 import fr.kenda.winzoriamenu.utils.ClickableText;
 import fr.kenda.winzoriamenu.utils.Messages;
+import fr.kenda.winzoriamenu.utils.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -64,6 +65,10 @@ public class WinzoriaMenuCommand implements CommandExecutor {
                 sendHelp(commandSender);
                 return true;
             case "reload":
+                if(!commandSender.hasPermission(Permission.RELOAD)) {
+                    commandSender.sendMessage(Messages.getPrefix() + Messages.getMessage("no_permission"));
+                    break;
+                }
                 guiManager.reloadGUI();
                 commandSender.sendMessage(Messages.getPrefix() + Messages.getMessage("menu_load", "{number}", String.valueOf(guiManager.getGuis().size())));
                 return true;
@@ -74,6 +79,7 @@ public class WinzoriaMenuCommand implements CommandExecutor {
                 }
                 return false;
         }
+        return false;
     }
 
     private void sendList(CommandSender sender) {
@@ -87,8 +93,6 @@ public class WinzoriaMenuCommand implements CommandExecutor {
         sender.sendMessage(Messages.transformColor("&8&m========== [ " + Messages.getPrefix() + "&8&m] =========="));
         sender.sendMessage(Messages.transformColor("&c/wm help: &7Afficher la liste d'aide"));
         sender.sendMessage(Messages.transformColor("&c/wm list: &7Afficher la liste des menus"));
-        sender.sendMessage(Messages.transformColor("&c/wm <menu>: &7Ouvrir le menu"));
-        sender.sendMessage(Messages.transformColor("&c/wm open <menu> <player>: &7Ouvrir le menu pour un joueur"));
         sender.sendMessage(Messages.transformColor("&8&m========== [ " + Messages.getPrefix() + "&8&m] =========="));
     }
 
