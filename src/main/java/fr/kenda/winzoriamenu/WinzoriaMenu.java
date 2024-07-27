@@ -8,6 +8,7 @@ import fr.kenda.winzoriamenu.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -39,31 +40,14 @@ public final class WinzoriaMenu extends JavaPlugin {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null)
             getLogger().log(Level.SEVERE, "Le plugin placeholderapi n'as pas été trouver. Certaines fonctionnalités pourraient entraîner des erreurs.");
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> {
-            //check de release
-            try {
-                PluginVersionning pluginVersionning = new PluginVersionning();
-                if (!pluginVersionning.isLatestVersion()) {
-                    String prefix = Messages.getPrefix();
-                    String newVersionMessage = prefix + Messages.transformColor("&aUne nouvelle version du plugin est disponible.");
-                    String url = "https://github.com/KendaFR/WinzoriaMenu/releases/tag/Latest";
-                    String clickableText = Messages.transformColor("&7&o" + url);
+        new BukkitRunnable() {
 
-                    Bukkit.getConsoleSender().sendMessage(newVersionMessage);
-                    Bukkit.getConsoleSender().sendMessage(prefix + "&a" + url);
-
-                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                        if(player.isOp()) {
-                            player.sendMessage(newVersionMessage);
-                            ClickableText.makeTextOpenLink(clickableText, "Ouvrir le lien", url, player);
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            @Override
+            public void run() {
+                refreshUpdate();
             }
-        }, 5 * 20);
 
+        }.runTaskTimer(this, 0L, 24 * 60 * 60 * 20L);
     }
 
     @Override
@@ -73,5 +57,33 @@ public final class WinzoriaMenu extends JavaPlugin {
 
     public <T> T getManager(Class<T> clazz) {
         return clazz.cast(manager.getManager(clazz));
+    }
+
+    public void refreshUpdate() {
+        //check de release
+        try {
+            Bukkit.getConsoleSender().sendMessage(Messages.getPrefix() + "§aRecherche de mise à jour...");
+            PluginVersionning pluginVersionning = new PluginVersionning();
+            if (!pluginVersionning.isLatestVersion()) {
+                String prefix = Messages.getPrefix();
+                String newVersionMessage = prefix + Messages.transformColor("&aUne nouvelle version du plugin est disponible.");
+                String url = "https://github.com/KendaFR/WinzoriaMenu/releases";
+                String clickableText = Messages.transformColor("&7&o" + url);
+
+                Bukkit.getConsoleSender().sendMessage(newVersionMessage);
+                Bukkit.getConsoleSender().sendMessage(prefix + "&a" + url);
+
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    if (player.isOp()) {
+                        player.sendMessage(newVersionMessage);
+                        ClickableText.makeTextOpenLink(clickableText, "Ouvrir le lien", url, player);
+                    }
+                }
+            } else
+                Bukkit.getConsoleSender().sendMessage(Messages.getPrefix() + "§aAucune nouvelle version trouvé.");
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
