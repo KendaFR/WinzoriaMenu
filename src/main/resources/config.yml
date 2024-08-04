@@ -12,6 +12,16 @@ generate_example_file: true
 
 #La liste des menus à enregistré dans le plugin
 menus:
-  example: "example.yml"
-  example2: "example2.yml"
-  example3: "example3.yml"
+  example:
+    file: "example.yml"
+    aliases:
+      - "exa1"
+  example2:
+    file: "example2.yml"
+    aliases:
+      - "exa2"
+      - "ex2"
+  example3:
+    file: "example3.yml"
+    aliases:
+      - "exa3"

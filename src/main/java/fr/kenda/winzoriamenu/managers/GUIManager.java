@@ -12,11 +12,13 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GUIManager implements IManager {
 
     private final Map<String, YamlConfiguration> guis = new HashMap<>();
+    private final Map<String, List<String>> aliasesMap = new HashMap<>();
     private final WinzoriaMenu instance = WinzoriaMenu.getInstance();
 
     @Override
@@ -26,10 +28,9 @@ public class GUIManager implements IManager {
         final String prefix = Messages.getPrefix();
         final FileConfiguration config = instance.getConfig();
 
-        //printMessage(console, prefix);
-
         config.getConfigurationSection("menus").getKeys(false).forEach(key -> {
-            String fileName = config.getString("menus." + key);
+            String fileName = config.getString("menus." + key + ".file");
+            List<String> aliases = config.getStringList("menus." + key + ".aliases");
             File file = new File(dataFolder + "/menus/" + fileName);
 
             if (!file.exists()) {
@@ -39,7 +40,8 @@ public class GUIManager implements IManager {
 
             YamlConfiguration menu = YamlConfiguration.loadConfiguration(file);
             guis.put(key, menu);
-            registerCommand(key);
+            aliasesMap.put(key, aliases);
+            registerCommand(key, aliases);
             console.sendMessage(prefix + Messages.transformColor("&8&oChargement du fichier: " + fileName));
         });
     }
@@ -48,23 +50,41 @@ public class GUIManager implements IManager {
         console.sendMessage(Messages.transformColor("&8&m========== [ " + prefix + "&8&m] =========="));
     }
 
-    private void registerCommand(String cmd) {
-        WMCommand.registerCommand(cmd, (sender, command, label, args) -> {
+    private void registerCommand(String key, List<String> aliases) {
+        WMCommand.registerCommand(key, (sender, command, label, args) -> {
             if (!(sender instanceof Player)) {
                 Bukkit.getConsoleSender().sendMessage(Messages.transformColor("&cSeul un joueur peut faire cette commande."));
                 return false;
             }
 
             Player player = (Player) sender;
-            YamlConfiguration config = guis.get(cmd);
+            YamlConfiguration config = guis.get(key);
             CustomGUI gui = new CustomGUI(player, config);
             gui.create();
             return true;
         });
+
+        for (String alias : aliases) {
+            WMCommand.registerCommand(alias, (sender, command, label, args) -> {
+                if (!(sender instanceof Player)) {
+                    Bukkit.getConsoleSender().sendMessage(Messages.transformColor("&cSeul un joueur peut faire cette commande."));
+                    return false;
+                }
+
+                Player player = (Player) sender;
+                YamlConfiguration config = guis.get(key);
+                CustomGUI gui = new CustomGUI(player, config);
+                gui.create();
+                return true;
+            });
+        }
     }
 
     public void unregisterCommands() {
-        guis.keySet().forEach(WMCommand::unregisterCommand);
+        guis.keySet().forEach(key -> {
+            WMCommand.unregisterCommand(key);
+            aliasesMap.get(key).forEach(WMCommand::unregisterCommand);
+        });
     }
 
     public void reloadGUI() {

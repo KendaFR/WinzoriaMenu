@@ -40,7 +40,7 @@ public class CustomGUI implements Listener {
         this.owner = owner;
         title = Messages.transformColor(fileConfig.getString("menu_title"));
 
-        size = fileConfig.getInt("size");
+        size = ((fileConfig.getInt("size") + 8) / 9) * 9;
 
         final ConfigurationSection items = fileConfig.getConfigurationSection("items");
         for (String key : items.getKeys(false)) {
@@ -54,7 +54,13 @@ public class CustomGUI implements Listener {
         String itemKey = "items." + key + ".";
         ConfigurationSection cs;
 
-        final Material material = Material.valueOf(configuration.getString(itemKey + "material").toUpperCase());
+       final String matName = configuration.getString(itemKey + "material");
+         Material material;
+        if(matName != null)
+         material = Material.valueOf(matName.toUpperCase());
+        else
+            material = Material.BARRIER;
+
         final List<Integer> slots = configuration.getIntegerList(itemKey + "slots");
         final int amount = configuration.getInt(itemKey + "amount", 1);
 
@@ -128,6 +134,7 @@ public class CustomGUI implements Listener {
             if (item.getLores() != null) {
                 List<String> lores = item.getLores().stream()
                         .map(s -> Messages.transformColor(s.replace("%player%", owner.getName())))
+                        .map(s -> PlaceholderAPI.setPlaceholders(owner.getPlayer(), s))
                         .collect(Collectors.toList());
                 itemBuilder.setLore(lores);
             }

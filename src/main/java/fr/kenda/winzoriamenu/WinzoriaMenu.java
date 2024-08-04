@@ -47,7 +47,7 @@ public final class WinzoriaMenu extends JavaPlugin {
                 refreshUpdate();
             }
 
-        }.runTaskTimer(this, 0L, 24 * 60 * 60 * 20L);
+        }.runTaskTimer(this, 0L, 24 * 60 * 60 * 20L); //toutes les 24h, une verification de MAJs
     }
 
     @Override
